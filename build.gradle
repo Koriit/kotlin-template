@@ -30,7 +30,7 @@ ext {
 
 dependencies {
     configurations.all {
-//        exclude group: "log4j" // clashing transitive dependency
+        exclude group: "log4j" // example clashing transitive dependency
     }
 
     // KOTLIN
@@ -160,7 +160,7 @@ processResources {
     from "$buildDir/tmp/build.json"
 }
 
-def mainClass = "koriit.kotlin.ApplicationKt"
+def mainClass = "koriit.kotlin.myapp.ApplicationKt"
 
 jar {
     baseName projectName
@@ -170,6 +170,7 @@ jar {
 }
 
 shadowJar {
+    baseName projectName
     classifier null
     zip64 true
     mergeServiceFiles()
