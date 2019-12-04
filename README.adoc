@@ -18,6 +18,7 @@ It should be treated as give-or-take.
 
 . Gradle build
 . Bootable Jar
+. Docker
 . Dependency Injection
 . Configuration
 . JSON serialization (Jackson)
