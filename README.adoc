@@ -1,0 +1,39 @@
+= Kotlin Template
+
+image:https://www.travis-ci.org/Koriit/kotlin-template.svg?branch=master["Build Status", link="https://www.travis-ci.org/Koriit/kotlin-template"]
+image:https://www.codefactor.io/repository/github/koriit/kotlin-template/badge[CodeFactor,link=https://www.codefactor.io/repository/github/koriit/kotlin-template]
+image:https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg[ktlint,link=https://ktlint.github.io/]
+image:https://img.shields.io/github/license/koriit/kotlin-template[GitHub]
+
+Template of kotlin application.
+
+[NOTE]
+This template provides *opinionated* solutions to common problems during application development.
+It should be treated as give-or-take.
+
+[INFO]
+
+== Elements
+
+. Gradle build
+. Bootable Jar
+. Dependency Injection
+. Configuration
+. JSON serialization (Jackson)
+. Domain/DAO/Service
+. HTTP Client
+. HTTP API
+. OpenAPI3
+. Tests
+.. Configuration
+.. Mocks
+.. Stubs
+.. OpenAPI3 verification
+.. Simple class tests
+.. Interdependent class tests
+.. API testing
+
+== TODO
+
+. Circuit breaker
+. Connection Pool

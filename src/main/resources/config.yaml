@@ -1,0 +1,7 @@
+modelService: http://localhost
+
+httpApi:
+  scheme: http
+  host: localhost
+  rootPath: /
+  logPayloads: true

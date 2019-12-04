@@ -1,0 +1,14 @@
+GET {{host}}:{{port}}/{{rootPath}}/api/version
+
+###
+GET {{host}}:{{port}}/{{rootPath}}/api/entities/101
+
+###
+
+POST {{host}}:{{port}}/{{rootPath}}/api/entities
+Content-Type: application/json
+
+{
+"id": 1337,
+"code": "some_code"
+}

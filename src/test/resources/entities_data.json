@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "code": "ENTITY_1"
+  },
+  {
+    "id": 25,
+    "code": "ENTITY_25"
+  },
+  {
+    "id": 50,
+    "code": "ENTITY_50"
+  },
+  {
+    "id": 75,
+    "code": "ENTITY_75"
+  },
+  {
+    "id": 100,
+    "code": "ENTITY_100"
+  }
+]

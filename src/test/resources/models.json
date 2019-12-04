@@ -1,0 +1,16 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "name": "model_1"
+    },
+    {
+      "id": 2,
+      "name": "model_2"
+    },
+    {
+      "id": 3,
+      "name": "model_3"
+    }
+  ]
+}

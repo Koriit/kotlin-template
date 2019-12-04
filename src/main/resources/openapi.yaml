@@ -1,0 +1,251 @@
+openapi: 3.0.2
+
+info:
+  title: Entities Service
+  description: Service serving entities
+  version: "{{info.version}}"
+  contact:
+    name: Team Name
+    url: https://team.page
+    email: team@mailbox
+  license:
+    name: Proprietary
+
+servers:
+  - url: "{{scheme}}://{{host}}{{basePath}}"
+
+tags:
+  - name: App Version
+  - name: Entities
+    description: Entities CRUD
+
+paths:
+  /api/entities:
+    get:
+      tags:
+        - Entities
+      summary: Get paginated list of all entities
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntitiesList"
+        "400":
+          description: Bad Request
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entity"
+      responses:
+        "201":
+          description: Created
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+            Location:
+              description: URL of new entity
+              required: true
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /api/entities/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+        "404":
+          description: Not Found
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entity"
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+            Location:
+              description: URL of updated entity
+              required: true
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /api/entities/code={entityCode}:
+    get:
+      parameters:
+        - name: entityCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+        "404":
+          description: Not Found
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /version:
+    get:
+      tags:
+        - App Version
+      summary: Get application version
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/VersionDetails"
+
+components:
+  headers:
+    X-Request-ID:
+      description: Unique request id. This is either copied from X-Request-ID request header or generated new if not present.
+      required: true
+      schema:
+        type: string
+  schemas:
+    VersionDetails:
+      title: VersionDetails
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: string
+    Entity:
+      title: Entity
+      type: object
+      required: [id, code]
+      properties:
+        code:
+          type: string
+        id:
+          type: integer
+          format: int64
+    EntitiesList:
+      title: EntitiesList
+      type: object
+      required: [entities]
+      properties:
+        entities:
+          title: EntityList
+          type: array
+          items:
+            $ref: "#/components/schemas/Entity"
+    ApiError:
+      title: ApiError
+      type: object
+      required: [status, type, title, detail, instance, path]
+      properties:
+        detail:
+          type: string
+        instance:
+          type: string
+        path:
+          type: string
+        status:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+        title:
+          type: string
+        type:
+          type: string

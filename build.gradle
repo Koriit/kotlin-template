@@ -1,0 +1,198 @@
+/////////////
+// PLUGINS //
+/////////////
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.61"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "com.adarshr.test-logger" version "2.0.0"
+    id "org.owasp.dependencycheck" version "5.2.4"
+    id "com.github.hierynomus.license-report" version "0.15.0"
+    id "com.github.nwillc.buildinfo" version "0.1.4"
+    id "jacoco"
+    id "org.jlleitschuh.gradle.ktlint" version "9.1.1"
+    id "io.gitlab.arturbosch.detekt" version "1.2.1"
+    id "com.github.ben-manes.versions" version "0.27.0"
+}
+
+//////////////////
+// DEPENDENCIES //
+//////////////////
+
+repositories {
+    jcenter()
+}
+
+ext {
+    ktorVersion = "1.2.6"
+    kodeinVersion = "6.4.1"
+}
+
+dependencies {
+    configurations.all {
+//        exclude group: "log4j" // clashing transitive dependency
+    }
+
+    // KOTLIN
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2"
+
+    // Jackson
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.1"
+
+    // KODEIN DI
+    implementation "org.kodein.di:kodein-di-generic-jvm:$kodeinVersion"
+    implementation "koriit.kotlin:kodein-application:0.4.0"
+
+    // KTOR API Server
+    implementation "io.ktor:ktor-server-core:$ktorVersion"
+    implementation "io.ktor:ktor-server-cio:$ktorVersion"
+    implementation "io.ktor:ktor-jackson:$ktorVersion"
+    implementation "koriit.kotlin:ktor-time:0.1"
+    implementation "koriit.kotlin:ktor-controllers:0.4"
+    implementation "koriit.kotlin:ktor-controllers-openapi:0.3.2"
+    implementation "koriit.kotlin:ktor-error-responses:0.2.2"
+    implementation "koriit.kotlin:ktor-logging:0.2.1"
+
+    // HTTP
+    implementation "io.ktor:ktor-client-apache:$ktorVersion"
+    implementation "io.ktor:ktor-client-json-jvm:$ktorVersion"
+    implementation "koriit.kotlin:ktor-client-logging:0.1.1"
+
+    // Configuration
+    implementation "com.uchuhimo:konf-core:0.21.0"
+    implementation "com.uchuhimo:konf-yaml:0.21.0"
+    implementation "org.apache.commons:commons-text:1.8"
+
+    // LOGGING
+    implementation "koriit.kotlin:slf4j-utils-logback:0.1"
+
+    // TESTING
+    testImplementation "io.ktor:ktor-client-mock-jvm:$ktorVersion"
+    testImplementation "io.ktor:ktor-server-test-host:$ktorVersion"
+    testImplementation "org.hamcrest:hamcrest-core:2.2"
+    testImplementation("com.jayway.jsonpath:json-path-assert:2.4.0") {
+        exclude group: "org.hamcrest"
+    }
+    testImplementation "org.junit.jupiter:junit-jupiter:5.5.0"
+    testImplementation "io.mockk:mockk:1.9.3"
+    testImplementation "koriit.kotlin:openapi-matcher:0.5.1"
+}
+
+/////////////
+// COMPILE //
+/////////////
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def compilerArgs = [
+        "-Xjsr305=strict",
+        "-Xuse-experimental=io.ktor.util.KtorExperimentalAPI",
+        "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+        "-Xuse-experimental=kotlin.ExperimentalStdlibApi"
+]
+
+compileKotlin {
+    dependsOn ktlintFormat
+    kotlinOptions {
+        freeCompilerArgs += compilerArgs
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs += compilerArgs
+        jvmTarget = "1.8"
+    }
+}
+
+//////////
+// TEST //
+//////////
+
+ktlint {
+    verbose = true
+}
+
+detekt {
+    config = files("detekt.yml")
+    buildUponDefaultConfig = true
+}
+
+downloadLicenses {
+    includeProjectDependencies = true
+    dependencyConfiguration = "implementation"
+}
+project.configurations.getByName("implementation").setCanBeResolved(true)
+
+test {
+    useJUnitPlatform {
+        excludeTags project.hasProperty("fast") ? "Slow" : "None"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+if (!project.hasProperty("fast")) test.finalizedBy(jacocoTestReport)
+
+//////////////
+// ASSEMBLE //
+//////////////
+
+buildInfo {
+    doFirst {
+        mkdir "$buildDir/tmp"
+    }
+}
+
+buildinfo {
+    output = "$buildDir/tmp/build.json"
+}
+
+processResources {
+    dependsOn buildInfo
+    from "$buildDir/tmp/build.json"
+}
+
+def mainClass = "koriit.kotlin.ApplicationKt"
+
+jar {
+    baseName projectName
+    manifest {
+        attributes "Main-Class": mainClass
+    }
+}
+
+shadowJar {
+    classifier null
+    zip64 true
+    mergeServiceFiles()
+}
+
+build.finalizedBy(shadowJar)
+
+///////////
+// OTHER //
+///////////
+
+task getVersion {
+    doLast {
+        print project.version
+    }
+}
+
+task fmt {
+    dependsOn ktlintFormat
+}
+
+task run(type: JavaExec) {
+    dependsOn build
+    main = "-jar";
+    args jar.archivePath
+}

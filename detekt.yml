@@ -1,0 +1,12 @@
+build:
+  maxIssues: 0
+
+comments:
+  EndOfSentenceFormat:
+    active: true
+
+formatting:
+  active: false
+
+style:
+  active: false
