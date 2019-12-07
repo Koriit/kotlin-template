@@ -11,7 +11,7 @@ plugins {
     id "com.github.nwillc.buildinfo" version "0.1.4"
     id "jacoco"
     id "org.jlleitschuh.gradle.ktlint" version "9.1.1"
-    id "io.gitlab.arturbosch.detekt" version "1.2.1"
+    id "io.gitlab.arturbosch.detekt" version "1.2.2"
     id "com.github.ben-manes.versions" version "0.27.0"
 }
 
@@ -25,7 +25,7 @@ repositories {
 
 ext {
     ktorVersion = "1.2.6"
-    kodeinVersion = "6.4.1"
+    kodeinVersion = "6.5.0"
 }
 
 dependencies {
@@ -36,7 +36,7 @@ dependencies {
     // KOTLIN
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2-1.3.60"
 
     // Jackson
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1"
@@ -44,15 +44,15 @@ dependencies {
 
     // KODEIN DI
     implementation "org.kodein.di:kodein-di-generic-jvm:$kodeinVersion"
-    implementation "koriit.kotlin:kodein-application:0.4.0"
+    implementation "koriit.kotlin:kodein-application:0.4.1"
 
     // KTOR API Server
     implementation "io.ktor:ktor-server-core:$ktorVersion"
     implementation "io.ktor:ktor-server-cio:$ktorVersion"
     implementation "io.ktor:ktor-jackson:$ktorVersion"
-    implementation "koriit.kotlin:ktor-time:0.1"
-    implementation "koriit.kotlin:ktor-controllers:0.4"
-    implementation "koriit.kotlin:ktor-controllers-openapi:0.3.2"
+    implementation "koriit.kotlin:ktor-time:0.2.0"
+    implementation "koriit.kotlin:ktor-controllers:0.4.2"
+    implementation "koriit.kotlin:ktor-controllers-openapi:0.3.3"
     implementation "koriit.kotlin:ktor-error-responses:0.2.2"
     implementation "koriit.kotlin:ktor-logging:0.2.1"
 
@@ -76,9 +76,25 @@ dependencies {
     testImplementation("com.jayway.jsonpath:json-path-assert:2.4.0") {
         exclude group: "org.hamcrest"
     }
-    testImplementation "org.junit.jupiter:junit-jupiter:5.5.0"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
     testImplementation "io.mockk:mockk:1.9.3"
     testImplementation "koriit.kotlin:openapi-matcher:0.5.1"
+}
+
+/////////////
+// UPDATES //
+/////////////
+
+def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
+
+dependencyUpdates {
+    rejectVersionIf {
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    }
 }
 
 /////////////
@@ -115,6 +131,7 @@ compileTestKotlin {
 //////////
 
 ktlint {
+    version = "0.36.0"
     verbose = true
 }
 
