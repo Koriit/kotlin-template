@@ -1,0 +1,73 @@
+= Parameters
+
+List of configurable parameters during My App startup.
+
+
+|===
+|Name |Description |Type |Required |Default |Env variable |Property
+
+|Apis Model Service
+|
+|String
+|Yes
+|http://localhost
+|APIS_MODEL_SERVICE
+|apis.model.service
+
+|HTTP Api Scheme
+|
+|String
+|No
+|http
+|HTTPAPI_SCHEME
+|httpApi.scheme
+
+|HTTP Api Host
+|
+|String
+|No
+|localhost
+|HTTPAPI_HOST
+|httpApi.host
+
+|HTTP Api Port
+|
+|Integer
+|No
+|8080
+|HTTPAPI_PORT
+|httpApi.port
+
+|HTTP Api Root Path
+|
+|String
+|No
+|/
+|HTTPAPI_ROOTPATH
+|httpApi.rootPath
+
+|HTTP Api Stop Grace Period
+|The maximum amount of time for activity to cool down - in seconds
+|Long
+|No
+|3
+|HTTPAPI_STOPGRACEPERIOD
+|httpApi.stopGracePeriod
+
+|HTTP Api Stop Timeout
+|The maximum amount of time to wait until server stops gracefully - in seconds
+|Long
+|No
+|5
+|HTTPAPI_STOPTIMEOUT
+|httpApi.stopTimeout
+
+|HTTP Api Log Payloads
+|Whether to log request/response payloads
+|Boolean
+|No
+|false
+|HTTPAPI_LOGPAYLOADS
+|httpApi.logPayloads
+
+|===

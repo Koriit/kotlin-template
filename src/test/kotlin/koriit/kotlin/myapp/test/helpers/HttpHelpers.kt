@@ -11,12 +11,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.isA
 import org.hamcrest.core.IsEqual
 
-val asInt = isA<Int>(Int::class.java)
-val asLong = isA<Long>(Long::class.java)
-val asString = isA<String>(String::class.java)
-val asBoolean = isA<Boolean>(Boolean::class.java)
+internal val asInt = isA<Int>(Int::class.java)
+internal val asLong = isA<Long>(Long::class.java)
+internal val asString = isA<String>(String::class.java)
+internal val asBoolean = isA<Boolean>(Boolean::class.java)
 
-fun TestApplicationCall.assertApiError(status: HttpStatusCode) {
+internal fun TestApplicationCall.assertApiError(status: HttpStatusCode) {
     assertThat(response.status(), IsEqual(status))
     assertThat(response.contentType(), IsEqual(ContentType.Application.Json.withCharset(Charsets.UTF_8)))
     assertThat(response.content, isJson())

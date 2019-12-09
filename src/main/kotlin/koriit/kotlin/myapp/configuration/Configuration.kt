@@ -10,7 +10,7 @@ import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import koriit.kotlin.myapp.clients.model.ModelClient
 import koriit.kotlin.myapp.configuration.spec.ApplicationConfig
-import koriit.kotlin.myapp.configuration.spec.ApplicationConfig.modelService
+import koriit.kotlin.myapp.configuration.spec.ApplicationConfig.Apis.Model
 import koriit.kotlin.myapp.dao.EntityDAO
 import koriit.kotlin.myapp.helpers.BuildInfo
 import koriit.kotlin.myapp.services.EntityService
@@ -54,7 +54,7 @@ val configuration = Kodein.Module(MODULE_CONFIGURATION) {
     bind<ModelClient>() with singleton {
         val config: Config = instance()
 
-        ModelClient(httpClient = instance(), serviceUrl = config[modelService])
+        ModelClient(httpClient = instance(), serviceUrl = config[Model.service])
     }
 
     bind<BuildInfo>() with singleton {

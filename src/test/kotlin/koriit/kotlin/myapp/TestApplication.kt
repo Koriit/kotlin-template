@@ -8,7 +8,7 @@ import io.ktor.server.testing.TestApplicationEngine
 import koriit.kotlin.myapp.api.http.serverConfig
 import koriit.kotlin.myapp.clients.model.ModelClient
 import koriit.kotlin.myapp.clients.model.newModelClientHttpMock
-import koriit.kotlin.myapp.configuration.spec.ApplicationConfig.modelService
+import koriit.kotlin.myapp.configuration.spec.ApplicationConfig.Apis.Model
 import koriit.kotlin.myapp.dao.EntityDAO
 import koriit.kotlin.myapp.dao.newEntityDAOMock
 import koriit.kotlin.slf4j.logger
@@ -41,7 +41,7 @@ val testConfiguration = Kodein.Module(MODULE_TEST) {
     bind<ModelClient>(overrides = true) with singleton {
         val config: Config = instance()
 
-        ModelClient(httpClient = newModelClientHttpMock(), serviceUrl = config[modelService])
+        ModelClient(httpClient = newModelClientHttpMock(), serviceUrl = config[Model.service])
     }
 
     bind<TestApplicationEngine>() with singleton {
