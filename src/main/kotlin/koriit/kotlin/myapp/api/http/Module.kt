@@ -4,7 +4,6 @@ import com.uchuhimo.konf.Config
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
-import java.util.concurrent.TimeUnit
 import koriit.kotlin.myapp.api.http.configuration.HttpApiConfig
 import koriit.kotlin.myapp.api.http.configuration.HttpApiConfig.stopGracePeriod
 import koriit.kotlin.myapp.api.http.configuration.HttpApiConfig.stopTimeout
@@ -45,10 +44,6 @@ val httpApi = Kodein.Module(MODULE_HTTP_API) {
         val server: ApplicationEngine = direct.instance(tag = MODULE_HTTP_API)
         val config: Config = direct.instance()
 
-        server.stop(
-            config[stopGracePeriod],
-            config[stopTimeout],
-            TimeUnit.SECONDS
-        )
+        server.stop(config[stopGracePeriod], config[stopTimeout])
     }
 }

@@ -9,7 +9,7 @@ object HttpApiConfig : ConfigSpec(MODULE_HTTP_API) {
     val host by optional("localhost")
     val port by optional(8080)
     val rootPath by optional("/")
-    val stopGracePeriod by optional(3L)
-    val stopTimeout by optional(5L)
+    val stopGracePeriod by optional(3000L)
+    val stopTimeout by optional(5000L)
     val logPayloads by optional(false)
 }

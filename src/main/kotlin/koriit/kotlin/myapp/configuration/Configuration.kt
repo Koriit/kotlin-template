@@ -5,6 +5,7 @@ import com.uchuhimo.konf.Config
 import com.uchuhimo.konf.source.yaml
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
+import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders

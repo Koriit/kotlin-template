@@ -47,18 +47,18 @@ List of configurable parameters during My App startup.
 |httpApi.rootPath
 
 |HTTP Api Stop Grace Period
-|The maximum amount of time for activity to cool down - in seconds
+|The maximum amount of time for activity to cool down - in milliseconds
 |Long
 |No
-|3
+|3000
 |HTTPAPI_STOPGRACEPERIOD
 |httpApi.stopGracePeriod
 
 |HTTP Api Stop Timeout
-|The maximum amount of time to wait until server stops gracefully - in seconds
+|The maximum amount of time to wait until server stops gracefully - in milliseconds
 |Long
 |No
-|5
+|5000
 |HTTPAPI_STOPTIMEOUT
 |httpApi.stopTimeout
 
