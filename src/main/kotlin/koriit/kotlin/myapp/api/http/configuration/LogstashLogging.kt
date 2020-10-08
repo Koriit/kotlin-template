@@ -3,7 +3,6 @@ package koriit.kotlin.myapp.api.http.configuration
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationFeature
-import io.ktor.features.callId
 import io.ktor.features.origin
 import io.ktor.http.HttpHeaders
 import io.ktor.request.contentType
@@ -44,10 +43,6 @@ class LogstashLogging(config: Configuration) : Logging(config) {
         )
 
         val additionalInfo = mapOf(
-            "xRequestId" to call.callId,
-            "xForwardedFor" to call.request.headers[HttpHeaders.XForwardedFor],
-            "xMobileAppid" to call.request.headers["X-Mobile-Appid"],
-            "xChannel" to call.request.headers["X-Channel"],
             "request" to requestInfo,
             "response" to responseInfo
         )

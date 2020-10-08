@@ -14,6 +14,7 @@ import io.ktor.features.XForwardedHeaderSupport
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
+import io.ktor.http.HttpStatusCode.Companion.Conflict
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.jackson.JacksonConverter
 import io.ktor.routing.Routing
@@ -27,8 +28,10 @@ import koriit.kotlin.myapp.api.http.configuration.HttpApiConfig.port
 import koriit.kotlin.myapp.api.http.configuration.HttpApiConfig.scheme
 import koriit.kotlin.myapp.api.http.configuration.LogstashLogging
 import koriit.kotlin.myapp.api.http.controllers.appVersionController
-import koriit.kotlin.myapp.api.http.controllers.entitiesController
-import koriit.kotlin.myapp.exceptions.ItemNotFoundException
+import koriit.kotlin.myapp.api.http.controllers.usersController
+import koriit.kotlin.myapp.exceptions.DuplicateUserException
+import koriit.kotlin.myapp.exceptions.OptimisticLockException
+import koriit.kotlin.myapp.exceptions.UserNotFoundException
 import koriit.kotlin.myapp.helpers.BuildInfo
 import koriit.kotlin.slf4j.logger
 import koriit.kotlin.slf4j.mdc.correlation.continueCorrelation
@@ -44,6 +47,7 @@ import org.kodein.di.generic.instance
 
 private val log = logger {}
 
+@Suppress("LongMethod") // inevitable as this is actually a configuration
 fun DKodein.serverConfig() = applicationEngineEnvironment {
     val config: Config = instance()
     val buildInfo: BuildInfo = instance()
@@ -68,7 +72,11 @@ fun DKodein.serverConfig() = applicationEngineEnvironment {
         }
 
         install(LogstashLogging) {
-            this.logPayloads = logPayloads
+            logRequests = logPayloads
+            logResponses = logPayloads
+            logFullUrl = logPayloads
+            logBody = logPayloads
+            logHeaders = logPayloads
             filterPath("/api", "/version", "/openapi")
         }
 
@@ -84,7 +92,9 @@ fun DKodein.serverConfig() = applicationEngineEnvironment {
         install(ErrorResponses) {
             handler<DefaultExceptionHandler> {
                 // Domain
-                register<ItemNotFoundException>(NotFound)
+                register<UserNotFoundException>(NotFound)
+                register<OptimisticLockException>(Conflict)
+                register<DuplicateUserException>(Conflict)
                 // Jackson
                 registerReceive<JsonProcessingException>(BadRequest)
             }
@@ -106,7 +116,7 @@ fun DKodein.serverConfig() = applicationEngineEnvironment {
             appVersionController(buildInfo)
 
             route("/api") {
-                entitiesController(instance())
+                usersController(instance())
             }
 
             val apiDoc = javaClass.getResourceAsStream("/openapi.yaml").reader().readText()

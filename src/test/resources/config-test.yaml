@@ -1,1 +1,3 @@
-modelService: http://test
+apis:
+  model:
+    service: http://test

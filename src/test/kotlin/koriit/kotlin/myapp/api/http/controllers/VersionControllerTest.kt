@@ -9,7 +9,6 @@ import io.ktor.http.withCharset
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.contentType
 import io.ktor.server.testing.handleRequest
-import java.util.concurrent.TimeUnit
 import koriit.kotlin.myapp.TestApplication
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
@@ -32,7 +31,7 @@ internal class VersionControllerTest : KodeinAware {
 
     @AfterAll
     fun stop() {
-        server.stop(0L, 0L, TimeUnit.MILLISECONDS)
+        server.stop(0L, 0L)
     }
 
     @Test

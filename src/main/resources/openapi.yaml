@@ -1,8 +1,8 @@
 openapi: 3.0.2
 
 info:
-  title: Entities Service
-  description: Service serving entities
+  title: Users Service
+  description: Service serving users
   version: "{{info.version}}"
   contact:
     name: Team Name
@@ -16,22 +16,22 @@ servers:
 
 tags:
   - name: App Version
-  - name: Entities
-    description: Entities CRUD
+  - name: Users
+    description: Users CRUD
 
 paths:
-  /api/entities:
+  /api/users:
     get:
       tags:
-        - Entities
-      summary: Get paginated list of all entities
+        - Users
+      summary: Get paginated list of all users
       parameters:
         - name: limit
           in: query
           schema:
             type: integer
             format: int32
-            default: 0
+            default: 20
         - name: page
           in: query
           schema:
@@ -47,7 +47,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntitiesList"
+                $ref: "#/components/schemas/UsersList"
         "400":
           description: Bad Request
           headers:
@@ -63,18 +63,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Entity"
+              $ref: "#/components/schemas/NewUser"
       responses:
         "201":
           description: Created
           headers:
             X-Request-ID:
               $ref: "#/components/headers/X-Request-ID"
-            Location:
-              description: URL of new entity
-              required: true
+          content:
+            application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/UserDetails"
+
         "400":
           description: Bad Request
           headers:
@@ -85,7 +85,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiError"
 
-  /api/entities/{id}:
+  /api/users/{id}:
     get:
       parameters:
         - name: id
@@ -103,7 +103,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Entity"
+                $ref: "#/components/schemas/UserDetails"
         "404":
           description: Not Found
           headers:
@@ -126,18 +126,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Entity"
+              $ref: "#/components/schemas/UserUpdate"
       responses:
         "200":
           description: OK
           headers:
             X-Request-ID:
               $ref: "#/components/headers/X-Request-ID"
-            Location:
-              description: URL of updated entity
-              required: true
+          content:
+            application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/UserDetails"
         "400":
           description: Bad Request
           headers:
@@ -147,11 +146,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    patch:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatch"
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetails"
+        "400":
+          description: Bad Request
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Not Found
+          headers:
+            X-Request-ID:
+              $ref: "#/components/headers/X-Request-ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 
-  /api/entities/code={entityCode}:
+  /api/users/login={userLogin}:
     get:
       parameters:
-        - name: entityCode
+        - name: userLogin
           in: path
           required: true
           schema:
@@ -165,7 +215,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Entity"
+                $ref: "#/components/schemas/UserDetails"
         "404":
           description: Not Found
           headers:
@@ -208,26 +258,64 @@ components:
       properties:
         version:
           type: string
-    Entity:
-      title: Entity
+    UserUpdate:
+      title: UserUpdate
       type: object
-      required: [id, code]
+      required: [name, age]
       properties:
-        code:
+        name:
           type: string
+        age:
+          type: integer
+          format: int32
+    UserPatch:
+      title: UserPatch
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+          format: int32
+    UserDetails:
+      title: UserDetails
+      type: object
+      required: [id, login, name, age]
+      properties:
         id:
           type: integer
           format: int64
-    EntitiesList:
-      title: EntitiesList
+        login:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+          format: int32
+    NewUser:
+      title: NewUser
       type: object
-      required: [entities]
+      required: [name, age, login, password]
       properties:
-        entities:
-          title: EntityList
+        age:
+          type: integer
+          format: int32
+        login:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+    UsersList:
+      title: UsersList
+      type: object
+      required: [users]
+      properties:
+        users:
+          title: UsersList
           type: array
           items:
-            $ref: "#/components/schemas/Entity"
+            $ref: "#/components/schemas/UserDetails"
     ApiError:
       title: ApiError
       type: object

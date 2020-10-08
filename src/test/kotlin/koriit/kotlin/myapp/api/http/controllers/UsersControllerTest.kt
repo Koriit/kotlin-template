@@ -18,7 +18,6 @@ import io.ktor.server.testing.contentType
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import koriit.kotlin.myapp.TestApplication
 import koriit.kotlin.myapp.test.helpers.asInt
 import koriit.kotlin.myapp.test.helpers.asString
@@ -38,7 +37,7 @@ import org.junit.jupiter.api.Test
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.instance
 
-internal class EntitiesControllerTest : KodeinAware {
+internal class UsersControllerTest : KodeinAware {
 
     override val kodein = TestApplication()
 
@@ -51,25 +50,25 @@ internal class EntitiesControllerTest : KodeinAware {
 
     @AfterAll
     fun stop() {
-        server.stop(0L, 0L, TimeUnit.MILLISECONDS)
+        server.stop(0L, 0L)
     }
 
     @Nested
-    @DisplayName("GET /entities")
-    inner class GetEntities {
+    @DisplayName("GET /users")
+    inner class GetUsers {
 
         @Test
-        fun `Should return list of entities`() = with(server) {
-            with(handleRequest(HttpMethod.Get, "/api/entities")) {
+        fun `Should return list of users`() = with(server) {
+            with(handleRequest(HttpMethod.Get, "/api/users")) {
                 assertThat(response.status(), equalTo(OK))
                 assertThat(response.contentType(), equalTo(ContentType.Application.Json.withCharset(Charsets.UTF_8)))
                 assertThat(response.content, isJson())
-                assertThat(response.content, hasJsonPath("$.entities", hasSize(5)))
-                assertThat(response.content, hasJsonPath("$.entities[?(@.code=='ENTITY_1')]"))
-                assertThat(response.content, hasJsonPath("$.entities[?(@.code=='ENTITY_25')]"))
-                assertThat(response.content, hasJsonPath("$.entities[?(@.code=='ENTITY_50')]"))
-                assertThat(response.content, hasJsonPath("$.entities[?(@.code=='ENTITY_75')]"))
-                assertThat(response.content, hasJsonPath("$.entities[?(@.code=='ENTITY_100')]"))
+                assertThat(response.content, hasJsonPath("$.users", hasSize(5)))
+                assertThat(response.content, hasJsonPath("$.users[?(@.login=='admin')]"))
+                assertThat(response.content, hasJsonPath("$.users[?(@.login=='john')]"))
+                assertThat(response.content, hasJsonPath("$.users[?(@.login=='kowal123')]"))
+                assertThat(response.content, hasJsonPath("$.users[?(@.login=='mieszko1')]"))
+                assertThat(response.content, hasJsonPath("$.users[?(@.login=='krex')]"))
             }
         }
 
@@ -93,18 +92,18 @@ internal class EntitiesControllerTest : KodeinAware {
                 Case(3, 2, 0),
                 Case(3, 3, 0)
             ).testCases {
-                with(handleRequest(HttpMethod.Get, "/api/entities?limit=$limit&page=$page")) {
+                with(handleRequest(HttpMethod.Get, "/api/users?limit=$limit&page=$page")) {
                     assertThat(response.status(), equalTo(OK))
                     assertThat(response.contentType(), equalTo(ContentType.Application.Json.withCharset(Charsets.UTF_8)))
                     assertThat(response.content, isJson())
-                    assertThat(response.content, hasJsonPath("$.entities", hasSize(results)))
+                    assertThat(response.content, hasJsonPath("$.users", hasSize(results)))
                 }
             }
         }
 
         @Test
         fun `Should return 400 for negative page`() = with(server) {
-            with(handleRequest(HttpMethod.Get, "/api/entities?limit=0&page=-1")) {
+            with(handleRequest(HttpMethod.Get, "/api/users?limit=0&page=-1")) {
                 assertApiError(BadRequest)
                 assertThat(response.content, hasJsonPath("$[?(@.detail =~ /.*page.*/)]"))
                 assertThat(response.content, hasJsonPath("$[?(@.detail =~ /.*negative.*/)]"))
@@ -113,12 +112,12 @@ internal class EntitiesControllerTest : KodeinAware {
     }
 
     @Nested
-    @DisplayName("GET /entity/{entityId}")
-    inner class GetEntityById {
+    @DisplayName("GET /user/{userId}")
+    inner class GetUserById {
 
         @Test
-        fun `Should return entity body`() = with(server) {
-            with(handleRequest(HttpMethod.Get, "/api/entities/50")) {
+        fun `Should return user body`() = with(server) {
+            with(handleRequest(HttpMethod.Get, "/api/users/50")) {
                 assertThat(response.status(), equalTo(OK))
                 assertThat(response.contentType(), equalTo(ContentType.Application.Json.withCharset(Charsets.UTF_8)))
                 assertThat(response.content, isJson())
@@ -128,8 +127,8 @@ internal class EntitiesControllerTest : KodeinAware {
         }
 
         @Test
-        fun `Should return 404 when entity not found`() = with(server) {
-            with(handleRequest(HttpMethod.Get, "/api/entities/1337")) {
+        fun `Should return 404 when user not found`() = with(server) {
+            with(handleRequest(HttpMethod.Get, "/api/users/1337")) {
                 assertApiError(NotFound)
                 assertThat(response.content, hasJsonPath("$[?(@.detail =~ /.*1337.*/)]"))
             }
@@ -137,12 +136,12 @@ internal class EntitiesControllerTest : KodeinAware {
     }
 
     @Nested
-    @DisplayName("GET /entity/code={entityCode}")
-    inner class GetEntityByCode {
+    @DisplayName("GET /user/code={userCode}")
+    inner class GetUserByCode {
 
         @Test
-        fun `Should return entity body`() = with(server) {
-            with(handleRequest(HttpMethod.Get, "/api/entities/code=ENTITY_50")) {
+        fun `Should return user body`() = with(server) {
+            with(handleRequest(HttpMethod.Get, "/api/users/code=user_50")) {
                 assertThat(response.status(), equalTo(OK))
                 assertThat(response.contentType(), equalTo(ContentType.Application.Json.withCharset(Charsets.UTF_8)))
                 assertThat(response.content, isJson())
@@ -152,26 +151,26 @@ internal class EntitiesControllerTest : KodeinAware {
         }
 
         @Test
-        fun `Should return 404 when entity not found`() = with(server) {
-            with(handleRequest(HttpMethod.Get, "/api/entities/code=NOT_EXISTING_ENTITY")) {
+        fun `Should return 404 when user not found`() = with(server) {
+            with(handleRequest(HttpMethod.Get, "/api/users/code=NOT_EXISTING_user")) {
                 assertApiError(NotFound)
-                assertThat(response.content, hasJsonPath("$[?(@.detail =~ /.*NOT_EXISTING_ENTITY.*/)]"))
+                assertThat(response.content, hasJsonPath("$[?(@.detail =~ /.*NOT_EXISTING_user.*/)]"))
             }
         }
     }
 
     @Nested
-    @DisplayName("POST /entities")
+    @DisplayName("POST /users")
     inner class PostSearch {
 
         @Test
-        fun `Should add entities`() {
-            addEntity("ENTITY_TEST_POST")
+        fun `Should add users`() {
+            registerUser("user_TEST_POST")
         }
 
         @Test
         fun `Should return 415 when no content type`() = with(server) {
-            with(handleRequest(HttpMethod.Post, "/api/entities")) {
+            with(handleRequest(HttpMethod.Post, "/api/users")) {
                 assertApiError(HttpStatusCode.UnsupportedMediaType)
             }
         }
@@ -184,7 +183,7 @@ internal class EntitiesControllerTest : KodeinAware {
                 "1337",
                 ""
             ).testCases {
-                with(handleRequest(HttpMethod.Post, "/api/entities") {
+                with(handleRequest(HttpMethod.Post, "/api/users") {
                     addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                     setBody(this@testCases)
                 }) {
@@ -195,16 +194,16 @@ internal class EntitiesControllerTest : KodeinAware {
     }
 
     @Nested
-    @DisplayName("PUT /entity/{id}")
-    inner class PutEntity {
+    @DisplayName("PUT /user/{id}")
+    inner class PutUser {
 
         @Test
-        fun `Should update entity`() = with(server) {
-            val id = addEntity("ENTITY_TEST_PUT")
+        fun `Should update user`() = with(server) {
+            val id = registerUser("user_TEST_PUT")
 
-            val location = with(handleRequest(HttpMethod.Put, "/api/entities/$id") {
+            val location = with(handleRequest(HttpMethod.Put, "/api/users/$id") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody("""{"code": "ENTITY_TEST_PUT_2", "id": 1337}""")
+                setBody("""{"code": "user_TEST_PUT_2", "id": 1337}""")
             }) {
                 assertThat(response.status(), equalTo(OK))
                 assertThat(response.content, emptyOrNullString())
@@ -216,14 +215,14 @@ internal class EntitiesControllerTest : KodeinAware {
                 assertThat(response.status(), equalTo(OK))
                 assertThat(response.contentType(), equalTo(ContentType.Application.Json.withCharset(Charsets.UTF_8)))
                 assertThat(response.content, isJson())
-                assertThat(response.content, hasJsonPath("$.code", equalTo("ENTITY_TEST_PUT_2")))
+                assertThat(response.content, hasJsonPath("$.code", equalTo("user_TEST_PUT_2")))
                 assertThat(response.content, hasJsonPath("$.id", equalTo(id)))
             }
         }
 
         @Test
         fun `Should return 415 when no content type`() = with(server) {
-            with(handleRequest(HttpMethod.Put, "/api/entities/1337")) {
+            with(handleRequest(HttpMethod.Put, "/api/users/1337")) {
                 assertApiError(HttpStatusCode.UnsupportedMediaType)
             }
         }
@@ -237,7 +236,7 @@ internal class EntitiesControllerTest : KodeinAware {
                 "1337",
                 ""
             ).testCases {
-                with(handleRequest(HttpMethod.Put, "/api/entities/1337") {
+                with(handleRequest(HttpMethod.Put, "/api/users/1337") {
                     addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                     setBody(this@testCases)
                 }) {
@@ -247,10 +246,10 @@ internal class EntitiesControllerTest : KodeinAware {
         }
 
         @Test
-        fun `Should return 404 when entity not found`() = with(server) {
-            with(handleRequest(HttpMethod.Put, "/api/entities/1337") {
+        fun `Should return 404 when user not found`() = with(server) {
+            with(handleRequest(HttpMethod.Put, "/api/users/1337") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody("""{"code": "ENTITY_1337"}""")
+                setBody("""{"code": "user_1337"}""")
             }) {
                 assertApiError(NotFound)
             }
@@ -259,7 +258,7 @@ internal class EntitiesControllerTest : KodeinAware {
 
     @Test
     fun `Should respond with X-Request-Id header`() = with(server) {
-        with(handleRequest(HttpMethod.Get, "/api/entities")) {
+        with(handleRequest(HttpMethod.Get, "/api/users")) {
             assertThat(response.status(), equalTo(OK))
             assertThat(response.headers[HttpHeaders.XRequestId], IsNot(emptyOrNullString()))
         }
@@ -269,7 +268,7 @@ internal class EntitiesControllerTest : KodeinAware {
     fun `Should pass X-Request-Id header`() = with(server) {
         val requestId = UUID.randomUUID().toString()
 
-        with(handleRequest(HttpMethod.Get, "/api/entities") {
+        with(handleRequest(HttpMethod.Get, "/api/users") {
             addHeader(HttpHeaders.XRequestId, requestId)
         }) {
             assertThat(response.status(), equalTo(OK))
@@ -277,8 +276,8 @@ internal class EntitiesControllerTest : KodeinAware {
         }
     }
 
-    private fun addEntity(code: String): Int = with(server) {
-        val location = with(handleRequest(HttpMethod.Post, "/api/entities") {
+    private fun registerUser(code: String): Int = with(server) {
+        val location = with(handleRequest(HttpMethod.Post, "/api/users") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody("""{"code": "$code"}""")
         }) {

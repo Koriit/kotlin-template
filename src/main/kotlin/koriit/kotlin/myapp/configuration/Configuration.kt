@@ -12,9 +12,9 @@ import io.ktor.http.HttpHeaders
 import koriit.kotlin.myapp.clients.model.ModelClient
 import koriit.kotlin.myapp.configuration.spec.ApplicationConfig
 import koriit.kotlin.myapp.configuration.spec.ApplicationConfig.Apis.Model
-import koriit.kotlin.myapp.dao.EntityDAO
+import koriit.kotlin.myapp.dao.UsersDAO
 import koriit.kotlin.myapp.helpers.BuildInfo
-import koriit.kotlin.myapp.services.EntityService
+import koriit.kotlin.myapp.services.UsersService
 import koriit.kotlin.slf4j.logger
 import koriit.kotlin.slf4j.mdc.correlation.correlationId
 import korrit.kotlin.kodein.application.ApplicationEvents.Start
@@ -33,6 +33,7 @@ private val log = logger {}
 
 val configuration = Kodein.Module(MODULE_CONFIGURATION) {
     import(jackson)
+    import(database)
 
     bind<Config>() with singleton {
         Config()
@@ -83,20 +84,20 @@ val configuration = Kodein.Module(MODULE_CONFIGURATION) {
 }
 
 private fun Kodein.Builder.daos() {
-    bind<EntityDAO>() with singleton {
-        EntityDAO()
+    bind<UsersDAO>() with singleton {
+        UsersDAO()
     }
 }
 
 private fun Kodein.Builder.services() {
-    bind<EntityService>() with singleton {
-        EntityService(instance())
+    bind<UsersService>() with singleton {
+        UsersService(instance(), instance())
     }
 
     // Eager load
     on(Start) {
         direct.apply {
-            instance<EntityService>()
+            instance<UsersService>()
         }
     }
 }

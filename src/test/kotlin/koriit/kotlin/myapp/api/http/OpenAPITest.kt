@@ -2,7 +2,6 @@ package koriit.kotlin.myapp.api.http
 
 import io.ktor.http.HttpHeaders.XRequestId
 import io.ktor.server.testing.TestApplicationEngine
-import java.util.concurrent.TimeUnit
 import koriit.kotlin.myapp.TestApplication
 import koriit.kotlin.slf4j.logger
 import korrit.kotlin.ktor.controllers.HttpHeader
@@ -33,7 +32,7 @@ class OpenAPITest : KodeinAware {
 
     @AfterAll
     fun stop() {
-        server.stop(0L, 0L, TimeUnit.MILLISECONDS)
+        server.stop(0L, 0L)
     }
 
     @Test
